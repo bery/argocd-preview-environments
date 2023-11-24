@@ -1,0 +1,75 @@
+# DevOps account
+version: '3'
+
+vars:
+  AWS_PROFILE: cloudops-prod
+  IMAGE_VERSION:
+    sh: echo "dev-$(date +%Y%m%d%H%M%S)"
+  DOCKER_DOCKERFILE: Dockerfile
+  DOCKER_BUILD_CONTEXT: .
+  DOCKER_BUILD_PLATFORMS: "linux/arm64/v8"
+  DEFAULT_BUILD_ARGUMENTS: --build-arg DOCKER_REGISTRY={{.DOCKER_REGISTRY}}
+
+tasks:
+  authenticate:
+    cmds:
+      - aws ecr get-login-password --region {{.DOCKER_REGISTRY_REGION}} --profile {{.AWS_PROFILE}} | docker login --username AWS --password-stdin {{.DOCKER_REGISTRY}}
+
+  hadolint:
+    cmds:
+      - hadolint Dockerfile
+
+  dive:
+    cmds:
+      - dive {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}}
+
+  dive-ci:
+    cmds:
+      - dive --ci --ci-config /home/circleci/.dive.yaml {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}}
+
+  build:
+    deps: [pre-build, docker-build, post-build]
+
+  rebuild:
+    deps: [pre-build, docker-rebuild, post-build]
+
+  pre-build:
+    cmds:
+      - echo "pre-build"
+
+  post-build:
+    cmds:
+      - echo "post-build"
+
+  docker-build:
+    cmds:
+      - docker buildx build --load --platform linux/arm64/v8 {{.BUILD_ARGUMENTS}} {{.DEFAULT_BUILD_ARGUMENTS}} -t {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}} {{.DOCKER_BUILD_CONTEXT}} -f {{.DOCKER_DOCKERFILE}}
+
+  docker-rebuild:
+    cmds:
+      - docker buildx build --no-cache {{.BUILD_ARGUMENTS}} {{.DEFAULT_BUILD_ARGUMENTS}} -t {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}} {{.DOCKER_BUILD_CONTEXT}} -f {{.DOCKER_DOCKERFILE}}
+
+  pull:
+    cmds:
+      - docker pull {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}}
+
+  push:
+    deps: [authenticate]
+    cmds:
+      - docker buildx build --push --platform {{.DOCKER_BUILD_PLATFORMS}} --tag {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}} .
+
+  debug:
+    cmds:
+      - task: run
+
+  destroy:
+    cmds:
+      - docker rmi {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}}
+
+  destroy_all:
+    cmds:
+      - docker system prune -a
+  run:
+    deps: [build]
+    cmds:
+      - docker run -it --rm {{.ENV}} -p {{.PORT}}:{{.CONTAINER_PORT}} {{.VOLUMES}} {{.DOCKER_REGISTRY}}/{{.IMAGE_NAME}}:{{.IMAGE_VERSION}} bash

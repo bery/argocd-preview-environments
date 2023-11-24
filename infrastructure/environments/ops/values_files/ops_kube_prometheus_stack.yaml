@@ -1,0 +1,75 @@
+kube-prometheus-stack:
+  grafana:
+    headlessService: false # set to true to enable headless service for unified alerting
+    # adminPassword: ""
+    replicas: 1
+    persistence:
+      enabled: true
+    ingress:
+      enabled: true
+      hosts:
+      - grafana.ops.xbery.com
+      annotations:
+        kubernetes.io/ingress.class: alb
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:$AWS_ACCOUNT_ID:certificate/f3daa01f-dfa3-4814-b7b9-593682b6e642
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS":443}]'
+        alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    grafana.ini:
+      server:
+        root_url: "https://grafana.ops.xbery.com"
+      logs:
+        level: debug
+    sidecar:
+      plugins:
+        enabled: false
+        initPlugins: true
+      datasources:
+        isDefaultDatasource: false
+    plugins:
+    - https://github.com/grafana/github-datasource/releases/download/v1.4.7/grafana-github-datasource-1.4.7.linux_amd64.zip;grafana-github-datasource
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+        - name: 'import'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/import
+    dashboards:
+      import:
+        argocd:
+          gnetId: 14584
+        aws-ses:
+          gnetId: 1519
+        postgresql-database:
+          gnetId: 9628
+        postgresql-overview:
+          gnetId: 455
+        aws-rds:
+          gnetId: 707
+        aws-billing:
+          gnetId: 139
+        aws-elb:
+          gnetId: 650
+        aws-elasticache:
+          gnetId: 969
+        aws-alb-cloudwatch-metrics:
+          gnetId: 14361
+        aws-sqs:
+          gnetId: 584
+        loki-logging-dashboard:
+          gnetId: 12611

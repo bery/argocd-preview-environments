@@ -1,0 +1,7 @@
+1. this charts bootstraps multipple services in an eks cluster, including but not limited to
+  - logging
+  - monitoring
+  - ingress
+  - cert-manager
+  - external-dns
+  - prometheus

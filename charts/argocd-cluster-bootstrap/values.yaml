@@ -1,0 +1,49 @@
+git:
+  targetRevision: "main"
+destination:
+  server: ""
+project: default
+alb:
+  chartVersion: 1.4.8
+  serviceAccount:
+    name: aws-load-balancer-controller
+certManager:
+  chartVersion: 1.5.3
+clusterAutoscaler:
+  chartVersion: 9.28.0
+  autoDiscovery:
+    clusterName: ""
+  serviceAccount:
+    annotations:
+      roleArn: ""
+  awsRegion: us-east-1
+externalSecrets:
+  serviceAccount:
+    annotations:
+      roleArn: ""
+  secretsManager:
+    region: us-east-1
+prometheus:
+  enabled: false
+  chartVersion: 23.1.0
+loki:
+  enabled: false
+  chartVersion: 2.9.11
+stakaterReloader:
+  chartVersion: 1.0.22
+metricsServer:
+  enabled: false
+  chartVersion: 3.10.0
+kubeStateMetrics:
+  enabled: false
+  chartVersion: 5.10.1
+prometheusNodeExporter:
+  enabled: false
+  chartVersion: 4.21.0
+externalDns:
+  dryRun: true
+kubePrometheusStack:
+  enabled: false
+ingressNginx:
+  enabled: true
+  chartVersion: 4.7.1

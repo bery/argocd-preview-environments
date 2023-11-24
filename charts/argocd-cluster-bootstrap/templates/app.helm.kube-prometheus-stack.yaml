@@ -1,0 +1,30 @@
+{{ if .Values.kubePrometheusStack.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - repoURL: 'https://github.com/bery/ops.git'
+      path: charts/kube-prometheus-stack
+      targetRevision: {{ .Values.git.targetRevision | quote}}
+      helm:
+        releaseName: kube-prometheus-stack
+        valueFiles:
+          - $values/infrastructure/environments/cloudops_prod/values_files/{{ .Values.kubePrometheusStack.valuesFile }}
+    - repoURL: 'https://github.com/bery/ops.git'
+      targetRevision: {{ .Values.git.targetRevision | quote}}
+      ref: values
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: monitoring
+{{ end }}

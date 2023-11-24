@@ -1,0 +1,30 @@
+{{ if .Values.prometheus.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-prometheus
+  namespace: argocd
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+  sources:
+    - chart: prometheus
+      repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: {{ .Values.prometheus.chartVersion }}
+      helm:
+        releaseName: prometheus
+        valueFiles:
+          - $values/infrastructure/environments/cloudops_prod/values_files/{{ .Values.prometheus.valuesFile }}
+    - repoURL: 'https://github.com/bery/ops.git'
+      targetRevision: {{ .Values.git.targetRevision | quote}}
+      ref: values
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: monitoring
+{{ end }}

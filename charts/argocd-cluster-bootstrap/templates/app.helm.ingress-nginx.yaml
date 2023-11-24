@@ -1,0 +1,24 @@
+{{ if .Values.ingressNginx.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-ingress-nginx
+  namespace: argocd
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    chart: ingress-nginx
+    repoURL: https://kubernetes.github.io/ingress-nginx
+    targetRevision: {{ .Values.ingressNginx.chartVersion }}
+    helm:
+      releaseName: ingress-nginx
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: nginx-ingress
+{{ end }}

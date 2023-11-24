@@ -1,0 +1,65 @@
+{{- if .Values.helmHooks.databaseMigrations.useAdminUser }}
+{{- if and .Values.pr.enabled (not .Values.postgresql.enabled) (not .Values.pr.connectToReplica) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: v2-postgres-pij
+  labels:
+    app: v2-postgres-pij
+  annotations:
+    helm.sh/hook: {{ .Values.helmHook | quote }}
+    helm.sh/hook-delete-policy: {{ .Values.helmHookDeletePolicy | quote }}
+    argocd.argoproj.io/hook: {{ .Values.argoHook | quote }}
+    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  template:
+    metadata:
+      name: postgres-pij
+      labels:
+        app: postgres-pij
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: docker.io/postgres:15
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - |
+              set -x
+              if [ "$( psql -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} -d postgres -XtAc "SELECT 1 FROM pg_database WHERE datname='preview_db_{{ .Values.pr.number}}'" )" = '1' ]
+              then
+                  echo "Database already exists"
+              else
+                createdb -V && createdb -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} --owner ${TYPEORM_ADMIN_USERNAME} --template {{ .Values.pr.databaseTemplate}} preview_db_{{ .Values.pr.number}} \
+                && psql -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} -d preview_db_{{ .Values.pr.number}} -c "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO xb_api_sandbox_dev;" \
+                && psql -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} -d preview_db_{{ .Values.pr.number}} -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO xb_api_sandbox_dev;" \
+                && psql -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} -d preview_db_{{ .Values.pr.number}} -c "ALTER DEFAULT PRIVILEGES FOR ROLE xb_api_sandbox_dev_admin_dev IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO xb_api_sandbox_dev;" \
+                && psql -h ${TYPEORM_HOST} --port ${TYPEORM_PORT} -U ${TYPEORM_ADMIN_USERNAME} -d preview_db_{{ .Values.pr.number}} -c "ALTER DEFAULT PRIVILEGES FOR ROLE xb_api_sandbox_dev_admin_dev IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO xb_api_sandbox_dev;" \
+                && vacuumdb -h ${TYPEORM_HOST} --port 5432 -U ${TYPEORM_ADMIN_USERNAME} preview_db_{{ .Values.pr.number}}
+              fi
+          envFrom:
+          - configMapRef:
+              name: {{ include "app.fullname" . }}-ev
+          {{- include "common.deployment.secretref" . | nindent 10 }}
+          {{ if .Values.helmHooks.databaseMigrations.useAdminUser }}
+          env:
+            - name: TYPEORM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "app.fullname" . }}-sec
+                  key: TYPEORM_ADMIN_USERNAME
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "app.fullname" . }}-sec
+                  key: TYPEORM_ADMIN_PASSWORD
+          {{ end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- end }}
+{{- end }}

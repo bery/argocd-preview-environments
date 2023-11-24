@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudops-prod-bootstrap
+  namespace: argocd
+spec:
+  project: cloudops-prod-project
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    repoURL: 'https://github.com/bery/argocd-preview-environments'
+    path: charts/argocd-cluster-bootstrap
+    targetRevision: 'main'
+    helm:
+      parameters:
+      - name: project
+        value: cloudops-prod-project
+      - name: git.targetRevision
+        value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+      - name: destination.name
+        value: in-cluster
+      - name: loki.enabled
+        value: "true"
+      - name: kubePrometheusStack.enabled
+        value: "true"
+      - name: metricsServer.enabled
+        value: "true"
+      - name: kubePrometheusStack.valuesFile
+        value: ops_kube_prometheus_stack.yaml
+      - name: externalSecrets.serviceAccount.annotations.roleArn
+        value: arn:aws:iam::$AWS_ACCOUNT_ID:role/external-secrets
+      - name: externalDns.domainFilters[0]
+        value: "ops.xbery.net"
+      - name: externalDns.dryRun
+        value: "false"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: argocd

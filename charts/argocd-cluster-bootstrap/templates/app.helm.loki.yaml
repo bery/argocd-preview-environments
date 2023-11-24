@@ -1,0 +1,24 @@
+{{ if .Values.loki.enabled -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-loki
+  namespace: argocd
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    chart: loki-stack
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: {{ .Values.loki.chartVersion }}
+    helm:
+      releaseName: loki-stack
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: monitoring
+{{ end }}

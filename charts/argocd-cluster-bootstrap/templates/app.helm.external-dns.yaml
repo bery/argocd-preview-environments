@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-external-dns
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    repoURL: 'https://github.com/bery/ops.git'
+    path: charts/external-dns
+    targetRevision: {{ .Values.git.targetRevision | quote}}
+    helm:
+      releaseName: external-dns
+      parameters:
+        - name: external-dns.dryRun
+          value: {{ .Values.externalDns.dryRun | quote}}
+        - name: external-dns.zoneIdFilters[0]
+          value: "c7cd8b472d128e5be875c886b94f06b2"
+        - name: external-dns.logLevel
+          value: "debug"
+        - name: external-dns.provider
+          value: cloudflare
+        - name: external-dns.cloudflare.email
+          value: ops.group@xbery.com
+        - name: external-dns.policy
+          value: upsert-only
+{{ range $key, $value := .Values.externalDns.domainFilters }}
+        - name: external-dns.domainFilters[{{ $key }}]
+          value: {{ $value }}
+{{ end }}
+        - name: external-dns.extraEnvVars[0].name
+          value: CF_API_EMAIL
+        - name: external-dns.extraEnvVars[0].value
+          value: lukas@xbery.com
+        - name: external-dns.cloudflare.proxied
+          value: "false"
+        - name: external-dns.cloudflare.secretName
+          value: cloudflare-credentials
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: external-dns

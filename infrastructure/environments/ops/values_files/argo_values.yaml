@@ -1,0 +1,107 @@
+global:
+  networkPolicy:
+    create: true
+    defaultDenyIngress: true
+  addPrometheusAnnotations: true
+controller:
+  metrics:
+    enabled: true
+configs:
+  cm:
+    create: false
+  rbac:
+    "policy.default": "role:readonly"
+
+repoServer:
+  metrics:
+    enabled: true
+server:
+  metrics:
+    enabled: true
+  extraArgs:
+  - --insecure
+  ingress:
+    enabled: true
+    https: true
+    ingressClassName: "alb"
+    tls:
+    - secretName: ssl-cert
+      hosts:
+      - "acd.ops.xbery.com"
+    hosts:
+    - "acd.ops.xbery.com"
+    annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/target-type: ip
+notifications:
+  enabled: true
+  metrics:
+    enabled: true
+  argocdUrl: "https://acd.ops.xbery.com"
+  templates:
+    template.app-sync-failed: |
+      message: |
+        Failed deploying to {{.app.metadata.annotations.link}}
+      github:
+        repoURLPath: "bery/xbery-monorepo"
+        revisionPath: "{{.app.metadata.annotations.revision}}"
+        status:
+          state: failure
+          label: "continuous-delivery/{{.app.metadata.name}}"
+          targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+    template.app-sync-running: |
+      message: |
+        Deploying to {{.app.metadata.annotations.link}}
+      github:
+        repoURLPath: "bery/xbery-monorepo"
+        revisionPath: "{{.app.metadata.annotations.revision}}"
+        status:
+          state: pending
+          label: "continuous-delivery/{{.app.metadata.name}}"
+          targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+    template.app-sync-succeeded: |
+      message: |
+        Deployed to {{.app.metadata.annotations.link}}
+      github:
+        repoURLPath: "bery/xbery-monorepo"
+        revisionPath: "{{.app.metadata.annotations.revision}}"
+        status:
+          state: success
+          label: "continuous-delivery/{{.app.metadata.name}}"
+          targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+
+  triggers:
+    trigger.on-sync-failed: |
+      - description: Application sync failed.
+        when: app.status.operationState.phase in ['Failed']
+        send:
+        - app-sync-failed
+    trigger.on-sync-running: |
+      - description: Application sync is running. Once per commit.
+        when: app.status.operationState.phase in ['Running']
+        send:
+        - app-sync-running
+    trigger.on-sync-succeeded: |
+      - description: Application deployed. Once per commit.
+        when: app.status.operationState.phase in ['Succeeded']
+        send:
+        - app-sync-succeeded
+dex:
+  metrics:
+    enabled: true
+    # volumes:
+    # - name: google-json
+    #   secret:
+    #     defaultMode: 420
+    #     secretName: argocd-google-groups-json
+    # volumeMounts:
+    # - mountPath: /tmp/oidc
+    #   name: google-json
+    #   readOnly: true
+redis:
+  metrics:
+    enabled: true
+applicationSet:
+  metrics:
+    enabled: true
