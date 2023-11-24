@@ -4,7 +4,7 @@ metadata:
   name: cloudops-prod-bootstrap
   namespace: argocd
 spec:
-  project: cloudops-prod-project
+  project: default
   syncPolicy:
     automated:
       prune: true
@@ -16,7 +16,7 @@ spec:
     helm:
       parameters:
       - name: project
-        value: cloudops-prod-project
+        value: default
       - name: git.targetRevision
         value: $ARGOCD_APP_SOURCE_TARGET_REVISION
       - name: destination.name

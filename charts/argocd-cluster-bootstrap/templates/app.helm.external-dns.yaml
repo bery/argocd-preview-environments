@@ -11,7 +11,7 @@ spec:
       prune: true
       selfHeal: true
   source:
-    repoURL: 'https://github.com/bery/ops.git'
+    repoURL: 'https://github.com/bery/argocd-preview-environments'
     path: charts/external-dns
     targetRevision: {{ .Values.git.targetRevision | quote}}
     helm:

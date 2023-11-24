@@ -14,14 +14,14 @@ spec:
       prune: true
       selfHeal: true
   sources:
-    - repoURL: 'https://github.com/bery/ops.git'
+    - repoURL: 'https://github.com/bery/argocd-preview-environments'
       path: charts/kube-prometheus-stack
       targetRevision: {{ .Values.git.targetRevision | quote}}
       helm:
         releaseName: kube-prometheus-stack
         valueFiles:
           - $values/infrastructure/environments/cloudops_prod/values_files/{{ .Values.kubePrometheusStack.valuesFile }}
-    - repoURL: 'https://github.com/bery/ops.git'
+    - repoURL: 'https://github.com/bery/argocd-preview-environments'
       targetRevision: {{ .Values.git.targetRevision | quote}}
       ref: values
   destination:

@@ -21,7 +21,7 @@ spec:
         releaseName: prometheus
         valueFiles:
           - $values/infrastructure/environments/cloudops_prod/values_files/{{ .Values.prometheus.valuesFile }}
-    - repoURL: 'https://github.com/bery/ops.git'
+    - repoURL: 'https://github.com/bery/argocd-preview-environments'
       targetRevision: {{ .Values.git.targetRevision | quote}}
       ref: values
   destination:
