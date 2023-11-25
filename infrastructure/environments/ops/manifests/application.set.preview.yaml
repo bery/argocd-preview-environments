@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: preview-apps
+  namespace: argocd
+spec:
+  generators:
+  - pullRequest:
+      github:
+        # The GitHub organization or user.
+        owner: bery
+        # The Github repository
+        repo: kad
+        # Reference to a Secret containing an access token. (optional)
+        tokenRef:
+          secretName: github-token
+          key: github-token
+        # Labels is used to filter the PRs that you want to target. (optional)
+        labels:
+        - preview
+      requeueAfterSeconds: 30
+  template:
+    metadata:
+      name: 'preview-{{number}}'
+      labels:
+        environment: 'development'
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-running.github: ""
+        notifications.argoproj.io/subscribe.on-sync-failed.github: ""
+        notifications.argoproj.io/subscribe.on-sync-succeeded.github: ""
+        # argocd-image-updater.argoproj.io/image-list: api=632538285035.dkr.ecr.eu-central-1.amazonaws.com/sandbox/api
+        # argocd-image-updater.argoproj.io/<image>.update-strategy: semver
+        # argocd-image-updater.argoproj.io/api.helm.image-name: api.image.name
+        # argocd-image-updater.argoproj.io/api.helm.image-tag: api.image.tag
+        revision: "{{head_sha}}" # used for github status notifications
+        link: "https://app-{{number}}.dev.xbery.net/" #github status link
+    spec:
+      project: default
+      info:
+      - name: 'Link:'
+        value: 'https://app-{{number}}.dev.xbery.net'
+      - name: 'PR:'
+        value: 'https://github.com/bery/kad/pull/{{ number }}'
+      sources:
+        - repoURL: 'https://github.com/bery/kad.git'
+          path: helm
+          targetRevision: '{{ branch }}'
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - values.yaml
+              - values_preview.yaml
+              - pr/values/values_{{ number }}.yaml
+            parameters:
+              - name: pr.number
+                value: '{{ number }}'
+              - name: image
+                value: '706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-{{ head_short_sha }}'
+      destination:
+        name: "in-cluster"
+        namespace: preview-{{number}}
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        retry:
+          limit: 3
+          backoff:
+            duration: 60s
+            factor: 2
+            maxDuration: 20m
+        # syncOptions:
+        #   - CreateNamespace=true

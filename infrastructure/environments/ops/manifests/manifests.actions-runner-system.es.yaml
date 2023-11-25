@@ -1,0 +1,17 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: github-token-es
+  namespace: argocd
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: cluster-secretstore
+    kind: ClusterSecretStore
+  target:
+    name: github-token
+    creationPolicy: Owner
+  data:
+  - secretKey: github-token
+    remoteRef:
+      key: ops/preview-github-token
