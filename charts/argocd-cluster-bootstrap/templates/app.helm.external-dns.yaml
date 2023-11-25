@@ -33,10 +33,10 @@ spec:
         - name: external-dns.domainFilters[{{ $key }}]
           value: {{ $value }}
 {{ end }}
-        - name: external-dns.extraEnvVars[0].name
-          value: CF_API_EMAIL
-        - name: external-dns.extraEnvVars[0].value
-          value: lukas@xbery.net
+        # - name: external-dns.extraEnvVars[0].name
+        #   value: CF_API_EMAIL
+        # - name: external-dns.extraEnvVars[0].value
+        #   value: lukas@xbery.net
         - name: external-dns.cloudflare.proxied
           value: "false"
         - name: external-dns.cloudflare.secretName
