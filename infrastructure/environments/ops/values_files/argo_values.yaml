@@ -18,8 +18,8 @@ repoServer:
 server:
   metrics:
     enabled: true
-  # extraArgs:
-  # - --insecure
+  extraArgs:
+  - --insecure #does not work when using kubectl port forward
   ingress:
     enabled: true
     https: true
