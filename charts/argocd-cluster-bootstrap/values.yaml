@@ -16,13 +16,13 @@ clusterAutoscaler:
   serviceAccount:
     annotations:
       roleArn: ""
-  awsRegion: us-east-1
+  awsRegion: eu-central-1
 externalSecrets:
   serviceAccount:
     annotations:
       roleArn: ""
   secretsManager:
-    region: us-east-1
+    region: eu-central-1
 prometheus:
   enabled: false
   chartVersion: 23.1.0

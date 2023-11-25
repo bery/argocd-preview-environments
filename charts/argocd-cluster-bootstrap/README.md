@@ -12,12 +12,12 @@ A Helm chart for Kubernetes
 | alb.serviceAccount.name | string | `"aws-load-balancer-controller"` |  |
 | certManager.chartVersion | string | `"1.5.3"` |  |
 | clusterAutoscaler.autoDiscovery.clusterName | string | `""` |  |
-| clusterAutoscaler.awsRegion | string | `"us-east-1"` |  |
+| clusterAutoscaler.awsRegion | string | `"eu-central-1"` |  |
 | clusterAutoscaler.chartVersion | string | `"9.28.0"` |  |
 | clusterAutoscaler.serviceAccount.annotations.roleArn | string | `""` |  |
 | destination.server | string | `""` |  |
 | externalDns.dryRun | bool | `true` |  |
-| externalSecrets.secretsManager.region | string | `"us-east-1"` |  |
+| externalSecrets.secretsManager.region | string | `"eu-central-1"` |  |
 | externalSecrets.serviceAccount.annotations.roleArn | string | `""` |  |
 | git.targetRevision | string | `"main"` |  |
 | ingressNginx.chartVersion | string | `"4.7.1"` |  |
