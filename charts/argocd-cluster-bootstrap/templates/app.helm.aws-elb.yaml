@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-aws-load-balancer-controller
+spec:
+  project: {{ .Values.project }}
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  source:
+    chart: aws-load-balancer-controller
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: {{ .Values.alb.chartVersion }}
+    helm:
+      releaseName: aws-load-balancer-controller
+      parameters:
+      - name: clusterName
+        value: {{ .Values.alb.clusterName }}
+      - name: serviceAccount.create
+        value: "false"
+      - name: serviceAccount.name
+        value: {{ .Values.alb.serviceAccount.name }}
+  destination:
+{{ .Values.destination | toYaml | indent 4 }}
+    namespace: kube-system
