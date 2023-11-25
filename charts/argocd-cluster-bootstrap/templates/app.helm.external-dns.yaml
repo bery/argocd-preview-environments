@@ -26,17 +26,17 @@ spec:
         - name: external-dns.provider
           value: cloudflare
         - name: external-dns.cloudflare.email
-          value: ops.group@xbery.net
+          value: beranek.lukas@gmail.com
         - name: external-dns.policy
           value: upsert-only
 {{ range $key, $value := .Values.externalDns.domainFilters }}
         - name: external-dns.domainFilters[{{ $key }}]
           value: {{ $value }}
 {{ end }}
-        # - name: external-dns.extraEnvVars[0].name
-        #   value: CF_API_EMAIL
-        # - name: external-dns.extraEnvVars[0].value
-        #   value: lukas@xbery.net
+        - name: external-dns.extraEnvVars[0].name
+          value: CF_API_EMAIL
+        - name: external-dns.extraEnvVars[0].value
+          value: beranek.lukas@gmail.com
         - name: external-dns.cloudflare.proxied
           value: "false"
         - name: external-dns.cloudflare.secretName
