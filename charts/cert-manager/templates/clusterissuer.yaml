@@ -4,7 +4,7 @@ metadata:
   name: cluster-issuer
 spec:
   acme:
-    email: ops.group+letsencrypt@xbery.com
+    email: ops.group+letsencrypt@xbery.net
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # Secret resource that will be used to store the account's private key.

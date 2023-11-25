@@ -14,7 +14,7 @@ A Helm chart for Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| email | string | `"lukas@xbery.com"` |  |
+| email | string | `"lukas@xbery.net"` |  |
 | secretStore.name | string | `"cluster-secretstore"` |  |
 
 ----------------------------------------------
