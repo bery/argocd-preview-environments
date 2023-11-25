@@ -22,19 +22,27 @@ spec:
       - name: destination.name
         value: in-cluster
       - name: loki.enabled
-        value: "true"
+        value: "false"
       - name: kubePrometheusStack.enabled
-        value: "true"
+        value: "false"
       - name: metricsServer.enabled
-        value: "true"
+        value: "false"
       - name: kubePrometheusStack.valuesFile
         value: ops_kube_prometheus_stack.yaml
       - name: externalSecrets.serviceAccount.annotations.roleArn
-        value: arn:aws:iam::$AWS_ACCOUNT_ID:role/external-secrets
+        value: arn:aws:iam::706337823207:role/external-secrets
       - name: externalDns.domainFilters[0]
-        value: "ops.xbery.net"
+        value: "xbery.net"
       - name: externalDns.dryRun
         value: "false"
+      - name: alb.clusterName
+        value: xbery-prod-cloudops-eks
+      - name: alb.serviceAccount.name
+        value: aws-load-balancer-controller
+      - name: clusterAutoscaler.autoDiscovery.clusterName
+        value: xbery-prod-cloudops-eks
+      - name: clusterAutoscaler.serviceAccount.annotations.roleArn
+        value: arn:aws:iam::706337823207:role/cluster-autoscaler
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argocd

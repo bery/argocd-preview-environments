@@ -79,3 +79,7 @@ debug.yaml
 .DS_Store
 
 bin
+
+infrastructure/bootstrap
+infrastructure/environments/
+infrastructure/modules/

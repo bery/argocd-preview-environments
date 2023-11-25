@@ -1,6 +1,6 @@
 global:
   networkPolicy:
-    create: true
+    create: false
     defaultDenyIngress: true
   addPrometheusAnnotations: true
 controller:
@@ -18,8 +18,8 @@ repoServer:
 server:
   metrics:
     enabled: true
-  extraArgs:
-  - --insecure
+  # extraArgs:
+  # - --insecure
   ingress:
     enabled: true
     https: true
@@ -27,9 +27,9 @@ server:
     tls:
     - secretName: ssl-cert
       hosts:
-      - "acd.ops.xbery.com"
+      - "acd.ops.xbery.net"
     hosts:
-    - "acd.ops.xbery.com"
+    - "acd.ops.xbery.net"
     annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -38,7 +38,7 @@ notifications:
   enabled: true
   metrics:
     enabled: true
-  argocdUrl: "https://acd.ops.xbery.com"
+  argocdUrl: "https://acd.ops.xbery.net"
   templates:
     template.app-sync-failed: |
       message: |
