@@ -17,7 +17,7 @@ A Helm chart for Kubernetes
 | clusterAutoscaler.serviceAccount.annotations.roleArn | string | `""` |  |
 | destination.server | string | `""` |  |
 | externalDns.dryRun | bool | `true` |  |
-| externalDns.zoneIdFilters | string | `"c7cd8b472d128e5be875c886b94f06b2"` |  |
+| externalDns.zoneIdFilters | string | `"c210ca23fcbe3fa0e45ead5622b78580"` |  |
 | externalSecrets.secretsManager.region | string | `"eu-central-1"` |  |
 | externalSecrets.serviceAccount.annotations.roleArn | string | `""` |  |
 | git.targetRevision | string | `"main"` |  |
