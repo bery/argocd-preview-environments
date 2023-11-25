@@ -20,7 +20,7 @@ spec:
         - name: external-dns.dryRun
           value: {{ .Values.externalDns.dryRun | quote}}
         - name: external-dns.zoneIdFilters[0]
-          value: "c7cd8b472d128e5be875c886b94f06b2"
+          value: {{ .Values.externalDns.zoneIdFilters | quote}}
         - name: external-dns.logLevel
           value: "debug"
         - name: external-dns.provider
