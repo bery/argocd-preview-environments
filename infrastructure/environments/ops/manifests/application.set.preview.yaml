@@ -42,6 +42,9 @@ spec:
       - name: 'PR:'
         value: 'https://github.com/bery/kad/pull/{{ number }}'
       sources:
+        - repoURL: 'https://github.com/bery/argocd-preview-environments-deployments'
+          targetRevision: 'main'
+          ref: values
         - repoURL: 'https://github.com/bery/kad.git'
           path: helm
           targetRevision: '{{ branch }}'
@@ -51,11 +54,12 @@ spec:
               - values.yaml
               - values_preview.yaml
               - pr/values/values_{{ number }}.yaml
+              - $values/values_preview_{{ number }}.yaml
             parameters:
               - name: pr.number
                 value: '{{ number }}'
-              - name: image
-                value: '706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-{{ head_short_sha }}'
+              # - name: image
+                # value: '706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-{{ head_short_sha }}'
               - name: ingress.enabled
                 value: 'true'
               - name : ingress.hosts[0].host
