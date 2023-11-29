@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kad
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://github.com/bery/argocd-preview-environments-deployments'
+      targetRevision: 'main'
+      ref: values
+    - repoURL: 'https://github.com/bery/kad.git'
+      path: helm
+      targetRevision: master
+      helm:
+        valueFiles:
+          - values.yaml
+          - $values/values.yaml
+        parameters:
+          - name: ingress.enabled
+            value: 'true'
+          - name : ingress.hosts[0].host
+            value: 'kad.ops.xbery.net'
+          - name : ingress.hosts[0].paths[0].path
+            value: '/*'
+          - name : ingress.hosts[1].paths[0].pathType
+            value: 'ImplementationSpecific'
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kad
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
