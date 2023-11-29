@@ -56,6 +56,14 @@ spec:
                 value: '{{ number }}'
               - name: image
                 value: '706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-{{ head_short_sha }}'
+              - name: ingress.enabled
+                value: 'true'
+              - name : ingress.hosts[0].host
+                value: 'app-{{number}}.ops.xbery.net'
+              - name : ingress.hosts[0].paths[0].path
+                value: '/*'
+              - name : ingress.hosts[1].paths[0].pathType
+                value: 'ImplementationSpecific'
       destination:
         name: "in-cluster"
         namespace: preview-{{number}}

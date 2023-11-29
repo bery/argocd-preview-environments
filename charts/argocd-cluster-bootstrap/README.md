@@ -17,6 +17,7 @@ A Helm chart for Kubernetes
 | clusterAutoscaler.serviceAccount.annotations.roleArn | string | `""` |  |
 | destination.server | string | `""` |  |
 | externalDns.dryRun | bool | `true` |  |
+| externalDns.policy | string | `"upsert-only"` |  |
 | externalDns.zoneIdFilters | string | `"c210ca23fcbe3fa0e45ead5622b78580"` |  |
 | externalSecrets.secretsManager.region | string | `"eu-central-1"` |  |
 | externalSecrets.serviceAccount.annotations.roleArn | string | `""` |  |

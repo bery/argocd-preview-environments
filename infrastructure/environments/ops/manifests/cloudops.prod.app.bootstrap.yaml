@@ -35,6 +35,8 @@ spec:
         value: "xbery.net"
       - name: externalDns.dryRun
         value: "false"
+      - name: externalDns.policy
+        value: "sync"
       - name: alb.clusterName
         value: xbery-prod-cloudops-eks
       - name: alb.serviceAccount.name

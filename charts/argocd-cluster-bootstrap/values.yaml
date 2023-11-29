@@ -43,6 +43,7 @@ prometheusNodeExporter:
 externalDns:
   dryRun: true
   zoneIdFilters: c210ca23fcbe3fa0e45ead5622b78580
+  policy: upsert-only
 kubePrometheusStack:
   enabled: false
 ingressNginx:
