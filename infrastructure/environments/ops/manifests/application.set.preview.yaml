@@ -46,6 +46,9 @@ spec:
           targetRevision: 'main'
           ref: values
         - repoURL: 'https://github.com/bery/kad.git'
+          targetRevision: '{{ branch }}'
+          ref: overrides
+        - repoURL: 'https://github.com/bery/kad.git'
           path: helm
           targetRevision: '{{ branch }}'
           helm:
@@ -53,7 +56,7 @@ spec:
             valueFiles:
               - values.yaml
               - values_preview.yaml
-              - pr/values/values_{{ number }}.yaml
+              - $overrides/pr/values/values_{{ number }}.yaml
               - $values/values_preview_{{ number }}.yaml
             parameters:
               - name: pr.number

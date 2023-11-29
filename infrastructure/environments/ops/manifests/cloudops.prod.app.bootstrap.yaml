@@ -26,7 +26,7 @@ spec:
       - name: kubePrometheusStack.enabled
         value: "false"
       - name: metricsServer.enabled
-        value: "false"
+        value: "false" #change me to true
       - name: kubePrometheusStack.valuesFile
         value: ops_kube_prometheus_stack.yaml
       - name: externalSecrets.serviceAccount.annotations.roleArn
